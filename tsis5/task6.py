@@ -6,3 +6,5 @@ text = 'a,sds.d b'
 
 result = re.sub(pattern, repl, text)
 print(result)
+
+print(divmod(50, 13))

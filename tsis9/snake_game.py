@@ -8,7 +8,9 @@ HEAD_COLOR = (19, 213, 213)
 BOARD_COLOR = (246, 197, 124)
 BLACK = (0, 0, 0)
 POISON_COLOR = (255, 0, 0)
-FOOD_COLOR = (78, 229, 73)
+FOOD_FOR_FIVE_COLOR = (78, 229, 73)
+FOOD_FOR_TEN_COLOR = (83, 253, 202)
+FOOD_FOR_FIFTEEN_COLOR = (243, 7, 243)
 SNAKE_COLOR = (19, 26, 215)
 BG_SOUND = 'sounds/background.mp3'
 FOOD_SOUND = pygame.mixer.Sound('sounds/food.mp3')
@@ -53,13 +55,22 @@ class EatebleObjects:
             )
         )
 
+
 # класс еды. которая имеет функции для координат и функция для создания клетки
-class Food(EatebleObjects):
-    pass
+class FoodForFive(EatebleObjects):
+    score_add = 5
+
+
+class FoodForTen(EatebleObjects):
+    score_add = 10
+
+
+class FoodForFifteen(EatebleObjects):
+    score_add = 15
 
 
 class Poison(EatebleObjects):
-    pass
+    score_add = -10
 
 
 # класс змейки, которая имеет функции отрисовки тела, функции движения, функции поедания еды и функцию, проверяющая
@@ -161,7 +172,12 @@ def game_over(score):
 def main():
     running = True
     snake = Snake()
-    food = Food(5, 5, FOOD_COLOR)
+    foods = [
+        FoodForFive(5, 5, FOOD_FOR_FIVE_COLOR),
+        FoodForTen(5, 5, FOOD_FOR_TEN_COLOR),
+        FoodForFifteen(5, 5, FOOD_FOR_FIFTEEN_COLOR)
+            ]
+    food = random.choices(foods, weights=[10, 5, 1])[0]
     poison = Poison(6, 8, POISON_COLOR)
     dx, dy = 0, 0
     fps = 5
@@ -170,6 +186,9 @@ def main():
     change_to = direction
     pygame.mixer.music.load(BG_SOUND)
     pygame.mixer.music.play(-1)
+
+    last_food = 0
+    food_timer = 15000
 
     while running:
 
@@ -222,13 +241,25 @@ def main():
             snake.points.append(Point(food.x, food.y))
             food.location.x = random.randint(0, WIDTH // BLOCK_SIZE - 1)
             food.location.y = random.randint(0, HEIGHT // BLOCK_SIZE - 1)
-            score += 10
+            if food.location.x == poison.location.x and food.location.y == poison.location.y:
+                food.location.x = random.randint(0, WIDTH // BLOCK_SIZE - 1)
+                food.location.y = random.randint(0, HEIGHT // BLOCK_SIZE - 1)
+            score = score + food.score_add
+            food = random.choices(foods, weights=[10, 5, 1])[0]
 
         if snake.check_collision(poison):
             POISON_SOUND.play()
             snake.points.pop(-1)
             poison.location.x = random.randint(0, WIDTH // BLOCK_SIZE - 1)
             poison.location.y = random.randint(0, HEIGHT // BLOCK_SIZE - 1)
+
+        now = pygame.time.get_ticks()
+
+        if now - last_food >= food_timer:
+            food = random.choices(foods, weights=[10, 5, 1])[0]
+            food.location.x = random.randint(0, WIDTH // BLOCK_SIZE - 1)
+            food.location.y = random.randint(0, HEIGHT // BLOCK_SIZE - 1)
+            last_food = now
 
         food.update()
         poison.update()
