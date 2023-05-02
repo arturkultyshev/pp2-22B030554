@@ -5,9 +5,9 @@ BEGIN
   RETURN QUERY
     SELECT *
     FROM contacts
-    WHERE phone_book.first_name LIKE '%' || pattern || '%'
-        OR phone_book.last_name LIKE '%' || pattern || '%'
-       OR phone_book.phone_number LIKE '%' || pattern || '%';
+    WHERE contacts.first_name LIKE '%' || pattern || '%'
+        OR contacts.last_name LIKE '%' || pattern || '%'
+       OR contacts.phone_number LIKE '%' || pattern || '%';
 END;
 $$ LANGUAGE plpgsql;
 

@@ -191,7 +191,6 @@ def adding_user(name, score):
         print(cursor.fetchone())
     cursor.close()
     conn.close()
-
 # главная фунция игры, в которой реализовано направления движения змейки,
 # увелечение змейки и очков от съеденной еды, увелечение скорости
 def main():
